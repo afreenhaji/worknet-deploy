@@ -17,11 +17,29 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use(cookieParser());
 
-// Recommended CORS config for secure frontend/backend communication
-app.use(cors({
-  origin: process.env.CLIENT_URL || '*', // Or set specific frontend URL
+// Dynamic CORS Configuration
+const allowedOrigins = [
+  'https://work-net.vercel.app',  // Production Frontend URL
+  'http://localhost:3000'          // Local development (Optional)
+];
+
+// Wildcard for Vercel Preview Deployments (Regex Match)
+const dynamicCors = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Allow server-to-server or curl requests
+
+    const isAllowed = allowedOrigins.includes(origin) || /^https:\/\/work.*\.vercel\.app$/.test(origin);
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-}));
+};
+
+app.use(cors(dynamicCors));
 
 // Static folder for image serving
 app.use("/public", express.static("public"));

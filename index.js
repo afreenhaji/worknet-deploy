@@ -14,29 +14,28 @@ dotenv.config();
 
 const app = express();
 
-// Define __dirname in ES Module scope
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// CORS Configuration
+
 app.use(cors({
-  origin: 'true',  // Change this if frontend URL differs
+  origin: 'true',  
   credentials: true
 }));
 
-// Middlewares
+
 app.use(express.json());
 app.use(cookieParser());
 
-// Serve static folder for uploads (Optional)
+
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// API Routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api/post', postRoutes);
 app.use('/api/user', userRoutes);
 
-// Database Connection and Server Start
+
 const PORT = process.env.PORT || 8000;
 
 mongoose.connect(process.env.MONGODB_URL)

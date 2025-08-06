@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 
 // CORS Configuration
 app.use(cors({
-  origin: 'https://work-net.vercel.app',  // Change this if frontend URL differs
+  origin: 'true',  // Change this if frontend URL differs
   credentials: true
 }));
 

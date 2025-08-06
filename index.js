@@ -1,66 +1,47 @@
-// path: backend/index.js
-import express from "express";
-import authRouter from "./routes/auth.routes.js";
-import protectedRouter from "./routes/protected.routes.js";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import dotenv from "dotenv";
-import connectDb from "./config/db.js";
-import postRouter from './routes/post.routes.js';
+import express from 'express';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import authRoutes from './routes/auth.routes.js';
+import postRoutes from './routes/post.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8000;
 
-// Middleware
+// Define __dirname in ES Module scope
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// CORS Configuration
+app.use(cors({
+  origin: 'https://work-net.vercel.app',  // Change this if frontend URL differs
+  credentials: true
+}));
+
+// Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
-// Dynamic CORS Configuration
-const allowedOrigins = [
-  'https://work-net.vercel.app',  // Production Frontend URL
-  'http://localhost:3000'          // Local development (Optional)
-];
-
-// Wildcard for Vercel Preview Deployments (Regex Match)
-const dynamicCors = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // Allow server-to-server or curl requests
-
-    const isAllowed = allowedOrigins.includes(origin) || /^https:\/\/work.*\.vercel\.app$/.test(origin);
-
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-};
-
-app.use(cors(dynamicCors));
-
-// Static folder for image serving
-app.use("/public", express.static("public"));
+// Serve static folder for uploads (Optional)
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // API Routes
-app.use("/api/auth", authRouter);
-app.use("/api/user", protectedRouter);
-app.use("/api/post", postRouter);
+app.use('/api/auth', authRoutes);
+app.use('/api/post', postRoutes);
+app.use('/api/user', userRoutes);
 
-// Health check route (optional)
-app.get("/", (req, res) => {
-  res.send("✅ WorkNet backend is up and running!");
-});
+// Database Connection and Server Start
+const PORT = process.env.PORT || 8000;
 
-// DB connection and server start
-connectDb()
+mongoose.connect(process.env.MONGODB_URL)
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
+    console.log('MongoDB connected');
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
-  .catch((error) => {
-    console.error("❌ DB connection failed:", error.message);
-  });
+  .catch(err => console.error('MongoDB connection error:', err));

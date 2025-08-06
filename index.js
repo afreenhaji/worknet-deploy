@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 
 
 app.use(cors({
-  origin: 'true',  
+  origin: ['https://work-net-git-main-afreens-projects-9c2e5838.vercel.app'],  
   credentials: true
 }));
 

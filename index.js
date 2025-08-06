@@ -17,9 +17,6 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use(cookieParser());
 
-// Recommended CORS config for secure frontend/backend communication
-import cors from "cors";
-
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true,

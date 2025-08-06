@@ -1,20 +1,20 @@
-import User from "../models/user.model.js";
+import User from "../models/UserModel.js";
 
 export const updateBio = async (req, res) => {
   try {
     const { bio } = req.body;
 
-    if (!bio || bio.trim() === "") {
+    if (typeof bio !== "string" || bio.trim().length === 0) {
       return res.status(400).json({ error: "Bio cannot be empty" });
     }
 
-    const userId = req.user.id;  // Authenticated user (from isAuth middleware)
+    const userId = req.user.id;
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { bio: bio.trim() },
       { new: true }
-    ).select("-password");
+    );
 
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });

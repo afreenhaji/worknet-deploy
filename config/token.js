@@ -3,14 +3,14 @@ import jwt from "jsonwebtoken";
 const genToken = (userId) => {
   try {
     const token = jwt.sign(
-      { id: userId },
+      { id: userId },  // payload
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }  // Optional but recommended
+      { expiresIn: "7d" }  // token expiry
     );
     return token;
   } catch (error) {
-    console.error("JWT Token Generation Failed:", error);
-    throw error;  // Better to throw so caller can handle it
+    console.error("JWT Generation Error:", error);
+    return null;
   }
 };
 

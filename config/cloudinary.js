@@ -1,30 +1,37 @@
-import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
+import cloudinary from "../config/cloudinary.js";
 
-// Cloudinary Config - move this to a central config file if possible
-cloudinary.config({ 
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-    api_key: process.env.CLOUDINARY_API_KEY, 
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
+export const uploadProfileImage = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No profile image uploaded' });
 
-const uploadOnCloudinary = async (filePath) => {
-    try {
-        if (!filePath) {
-            throw new Error("No file path provided for upload");
-        }
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'profile_images'
+    });
 
-        const uploadResult = await cloudinary.uploader.upload(filePath);
-        fs.unlinkSync(filePath);  // Remove local file after upload
-        return uploadResult.secure_url;
+    await User.findByIdAndUpdate(req.user.id, { profileImage: result.secure_url }, { new: true });
 
-    } catch (error) {
-        if (filePath && fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);  // Ensure cleanup even if error occurs
-        }
-        console.error("Cloudinary Upload Error:", error);
-        throw new Error("Failed to upload image to Cloudinary");
-    }
+    return res.json({ url: result.secure_url });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to upload profile image" });
+  }
 };
 
-export default uploadOnCloudinary;
+export const uploadCoverImage = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No cover image uploaded' });
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'cover_images'
+    });
+
+    await User.findByIdAndUpdate(req.user.id, { coverImage: result.secure_url }, { new: true });
+
+    return res.json({ url: result.secure_url });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to upload cover image" });
+  }
+};

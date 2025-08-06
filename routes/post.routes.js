@@ -1,6 +1,7 @@
-import express from "express";
-import { isAuth } from "../middlewares/isAuth.js";
-import { createPost, getAllPosts, getUserPosts } from "../controllers/postControllers.js";
+import express from 'express';
+import { createPost, getAllPosts, getUserPosts } from '../controllers/post.controllers.js';
+import { isAuth } from '../middlewares/isAuth.js';
+import upload from '../middlewares/multer.js';
 
 const router = express.Router();
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, getAllPosts, getUserPosts } from '../controllers/post.controllers.js';
+import { createPost, getAllPosts, getUserPosts } from '../controllers/postControllers.js';
 import { isAuth } from '../middlewares/isAuth.js';
 import upload from '../middlewares/multer.js';
 
